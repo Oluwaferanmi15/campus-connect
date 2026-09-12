@@ -1,0 +1,120 @@
+.auth-split {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+.auth-visual {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.auth-visual-top a {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #faf6ec;
+  text-decoration: none;
+}
+.auth-visual-bottom {
+  color: #faf6ec;
+  max-width: 420px;
+}
+.auth-visual-bottom h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 2rem;
+  line-height: 1.15;
+  margin: 0 0 12px;
+}
+.auth-visual-bottom p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #e4e8f2;
+  margin: 0;
+}
+
+.auth-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: #faf6ec;
+}
+.auth-form-panel form {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.auth-form-panel h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.9rem;
+  color: #14213d;
+  margin: 0 0 4px;
+}
+.auth-form-panel .auth-subtitle {
+  color: #5b564f;
+  font-size: 13.5px;
+  margin: 0 0 8px;
+}
+.auth-form-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  color: #5b564f;
+}
+.auth-form-panel input {
+  border: 1px solid #e3ded0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.auth-form-panel input:focus {
+  outline: none;
+  border-color: #f5a623;
+}
+.auth-form-panel button[type='submit'] {
+  margin-top: 6px;
+  background: linear-gradient(120deg, #d64550, #f5a623);
+  color: #14213d;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+.auth-form-panel button[type='submit']:hover {
+  filter: brightness(1.05);
+}
+.auth-form-panel p {
+  font-size: 13.5px;
+  color: #5b564f;
+  margin: 4px 0 0;
+}
+.auth-form-panel p a {
+  color: #d64550;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-form-error {
+  color: #b3261e;
+  font-size: 13px;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .auth-split {
+    grid-template-columns: 1fr;
+  }
+  .auth-visual {
+    display: none;
+  }
+}
