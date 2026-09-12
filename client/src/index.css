@@ -95,7 +95,7 @@ a { color: var(--color-marigold); text-decoration: none; }
   left: 0;
   bottom: 0;
   width: 220px;
-  overflow-y: auto;
+  overflow: visible;
   z-index: 40;
 }
 .navbar .brand {
