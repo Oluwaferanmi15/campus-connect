@@ -75,6 +75,8 @@
   padding: 10px 12px;
   font-size: 14px;
   font-family: inherit;
+  color: #14213d;
+  background: #ffffff;
 }
 .auth-form-panel input:focus {
   outline: none;
