@@ -2,6 +2,12 @@ const jwt = require('jsonwebtoken');
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
+
+// Tracks which pairs of users have a call in progress, so signaling can only
+// be relayed between people who actually started a call with each other.
+const activeCalls = new Set();
+const pairKey = (a, b) => [String(a), String(b)].sort().join(':');
 
 const socketAuth = (socket, next) => {
   try {
@@ -83,6 +89,65 @@ const registerChatHandlers = (io) => {
 
     socket.on('typing:stop', ({ conversationId }) => {
       socket.to(`conversation:${conversationId}`).emit('typing:stop', { userId: socket.userId });
+    });
+
+    // ---------- Voice / video calls (WebRTC signaling) ----------
+    socket.on('call:invite', async ({ conversationId, toUserId, video }, callback) => {
+      try {
+        const conversation = await Conversation.findById(conversationId);
+        const ids = (conversation?.participants || []).map((p) => p.toString());
+        if (!ids.includes(socket.userId) || !ids.includes(String(toUserId))) {
+          return callback?.({ error: 'not_allowed' });
+        }
+
+        const room = io.sockets.adapter.rooms.get(`user:${toUserId}`);
+        if (!room || room.size === 0) return callback?.({ error: 'offline' });
+
+        const caller = await User.findById(socket.userId).select('name avatarUrl');
+        activeCalls.add(pairKey(socket.userId, toUserId));
+        socket.callPeerId = String(toUserId);
+
+        io.to(`user:${toUserId}`).emit('call:incoming', {
+          conversationId,
+          video: !!video,
+          from: { _id: String(caller._id), name: caller.name, avatarUrl: caller.avatarUrl },
+        });
+        callback?.({ ok: true });
+      } catch (err) {
+        callback?.({ error: 'failed' });
+      }
+    });
+
+    const relayMap = {
+      'call:accept': 'call:accepted',
+      'call:reject': 'call:rejected',
+      'call:offer': 'call:offer',
+      'call:answer': 'call:answer',
+      'call:ice': 'call:ice',
+    };
+
+    Object.entries(relayMap).forEach(([incomingEvent, outgoingEvent]) => {
+      socket.on(incomingEvent, (payload = {}) => {
+        const to = String(payload.toUserId || '');
+        if (!activeCalls.has(pairKey(socket.userId, to))) return;
+        if (incomingEvent === 'call:accept') socket.callPeerId = to;
+        if (incomingEvent === 'call:reject') activeCalls.delete(pairKey(socket.userId, to));
+        io.to(`user:${to}`).emit(outgoingEvent, { ...payload, fromUserId: socket.userId });
+      });
+    });
+
+    socket.on('call:end', ({ toUserId } = {}) => {
+      const to = String(toUserId || '');
+      if (activeCalls.delete(pairKey(socket.userId, to))) {
+        io.to(`user:${to}`).emit('call:ended', { fromUserId: socket.userId });
+      }
+      socket.callPeerId = null;
+    });
+
+    socket.on('disconnect', () => {
+      if (socket.callPeerId && activeCalls.delete(pairKey(socket.userId, socket.callPeerId))) {
+        io.to(`user:${socket.callPeerId}`).emit('call:ended', { fromUserId: socket.userId });
+      }
     });
   });
 };

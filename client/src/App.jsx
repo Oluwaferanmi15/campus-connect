@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { CallProvider } from './context/CallContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import NavBar from './components/layout/NavBar';
 import Landing from './pages/Landing';
@@ -24,12 +25,13 @@ function Layout({ children }) {
     return <>{children}</>;
   }
   return (
-    <>
+    <CallProvider>
       <NavBar />
       <main className="app-main">{children}</main>
-    </>
+    </CallProvider>
   );
 }
+
 export default function App() {
   return (
     <AuthProvider>
@@ -38,70 +40,14 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/feed"
-            element={
-              <ProtectedRoute>
-                <Feed />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/groups"
-            element={
-              <ProtectedRoute>
-                <Groups />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/groups/:id"
-            element={
-              <ProtectedRoute>
-                <GroupDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/messages"
-            element={
-              <ProtectedRoute>
-                <Messages />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/messages/:id"
-            element={
-              <ProtectedRoute>
-                <ChatThread />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/people"
-            element={
-              <ProtectedRoute>
-                <People />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/course-registration"
-            element={
-              <ProtectedRoute>
-                <RegisterCourses />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+          <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+          <Route path="/groups/:id" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/messages/:id" element={<ProtectedRoute><ChatThread /></ProtectedRoute>} />
+          <Route path="/people" element={<ProtectedRoute><People /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/course-registration" element={<ProtectedRoute><RegisterCourses /></ProtectedRoute>} />
         </Routes>
       </Layout>
     </AuthProvider>

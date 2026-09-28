@@ -1,17 +1,8 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}${path.extname(file.originalname)}`);
-  },
-});
+// Files are held in memory just long enough to forward them to Cloudinary.
+const storage = multer.memoryStorage();
 
 const allowedImageTypes = /jpeg|jpg|png|gif|webp/;
 const allowedVideoTypes = /mp4|mov|webm|m4v|avi/;

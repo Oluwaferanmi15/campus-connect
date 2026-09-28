@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import api from '../../api/client';
 
-const isVideoUrl = (url) => /\.(mp4|mov|webm|m4v|avi)$/i.test(url);
+const isVideoUrl = (url) =>
+  /\/video\/upload\//.test(url) || /\.(mp4|mov|webm|m4v|avi)$/i.test(url);
 
 export default function PostCard({ post }) {
   const [likes, setLikes] = useState(post.likes?.length || 0);
@@ -24,7 +25,7 @@ export default function PostCard({ post }) {
         <div className="post-media">
           {post.media.map((url) =>
             isVideoUrl(url) ? (
-              <video key={url} src={url} controls />
+              <video key={url} src={url} controls playsInline />
             ) : (
               <img key={url} src={url} alt="" />
             )
