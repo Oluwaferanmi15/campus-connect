@@ -1,21 +1,24 @@
 const User = require('../models/User');
 
-// @route GET /api/users/search?q=<query>
-const searchUsers = async (req, res, next) => {
+// @route GET /api/users?q=<optional search>
+const listUsers = async (req, res, next) => {
   try {
     const { q = '' } = req.query;
-    if (!q.trim()) return res.json({ users: [] });
+    const filter = { _id: { $ne: req.user._id } };
 
-    const users = await User.find({
-      _id: { $ne: req.user._id },
-      $or: [
+    if (q.trim()) {
+      filter.$or = [
         { name: { $regex: q, $options: 'i' } },
         { email: { $regex: q, $options: 'i' } },
         { university: { $regex: q, $options: 'i' } },
-      ],
-    })
+        { department: { $regex: q, $options: 'i' } },
+      ];
+    }
+
+    const users = await User.find(filter)
       .select('name email university department avatarUrl verified')
-      .limit(20);
+      .sort({ name: 1 })
+      .limit(100);
 
     res.json({ users });
   } catch (err) {
@@ -36,4 +39,4 @@ const getUserProfile = async (req, res, next) => {
   }
 };
 
-module.exports = { searchUsers, getUserProfile };
+module.exports = { listUsers, getUserProfile };

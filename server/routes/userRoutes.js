@@ -1,10 +1,10 @@
 const express = require('express');
-const { searchUsers, getUserProfile } = require('../controllers/userController');
+const { listUsers, getUserProfile } = require('../controllers/userController');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/search', protect, searchUsers);
+router.get('/', protect, listUsers);
 router.get('/:id', protect, getUserProfile);
 
 module.exports = router;
