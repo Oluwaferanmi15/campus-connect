@@ -77,6 +77,30 @@
   font-family: inherit;
   color: #14213d;
   background: #ffffff;
+  width: 100%;
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-field input {
+  padding-right: 40px;
+}
+.password-toggle {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+.password-toggle:hover {
+  background: rgba(20, 33, 61, 0.06);
+  border-radius: 6px;
 }
 .auth-form-panel input:focus {
   outline: none;

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
+import { usePresence } from '../context/PresenceContext';
 
 export default function People() {
+  const { onlineUserIds } = usePresence();
   const [query, setQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,13 @@ export default function People() {
           {users.map((u) => (
             <li key={u._id} className="person-card">
               <div>
-                <strong>{u.name}</strong>
+                <span className="person-name-row">
+                  <span
+                    className={`status-dot ${onlineUserIds.has(u._id) ? 'online' : 'offline'}`}
+                    aria-label={onlineUserIds.has(u._id) ? 'Online' : 'Offline'}
+                  />
+                  <strong>{u.name}</strong>
+                </span>
                 {u.university && <span className="person-meta">{u.university}</span>}
                 {u.department && <span className="person-meta">{u.department}</span>}
               </div>

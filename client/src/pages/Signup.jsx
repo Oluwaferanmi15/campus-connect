@@ -6,7 +6,15 @@ import './Auth.css';
 export default function Signup() {
   const { signup } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', university: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    university: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState('');
 
   const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
@@ -14,8 +22,15 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     try {
-      await signup(form);
+      const { confirmPassword, ...payload } = form;
+      await signup(payload);
       navigate('/course-registration');
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed');
@@ -55,7 +70,43 @@ export default function Signup() {
           </label>
           <label>
             Password
-            <input type="password" value={form.password} onChange={update('password')} required minLength={6} />
+            <div className="password-field">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={update('password')}
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+          </label>
+          <label>
+            Confirm password
+            <div className="password-field">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                value={form.confirmPassword}
+                onChange={update('confirmPassword')}
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirm((v) => !v)}
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              >
+                {showConfirm ? '🙈' : '👁️'}
+              </button>
+            </div>
           </label>
           <label>
             University (optional for now)

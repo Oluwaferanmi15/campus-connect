@@ -4,6 +4,7 @@ import api from '../api/client';
 import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../context/AuthContext';
 import { useCall } from '../context/CallContext';
+import { usePresence } from '../context/PresenceContext';
 
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
 
@@ -24,6 +25,7 @@ export default function ChatThread() {
   const { id } = useParams();
   const { user } = useAuth();
   const { startCall, inCall } = useCall();
+  const { onlineUserIds } = usePresence();
   const socketRef = useSocket();
   const [messages, setMessages] = useState([]);
   const [peer, setPeer] = useState(null);
@@ -76,7 +78,14 @@ export default function ChatThread() {
   return (
     <div className="chat-thread-page">
       <div className="chat-header">
-        <span className="chat-header-name">{peer?.name || 'Chat'}</span>
+        <div className="chat-header-identity">
+          <span className="chat-header-name">{peer?.name || 'Chat'}</span>
+          {peer && (
+            <span className="chat-header-status">
+              {onlineUserIds.has(peer._id) ? 'Online' : 'Offline'}
+            </span>
+          )}
+        </div>
         {peer && (
           <div className="chat-header-actions">
             <button

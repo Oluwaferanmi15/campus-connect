@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CallProvider } from './context/CallContext';
+import { PresenceProvider } from './context/PresenceContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import NavBar from './components/layout/NavBar';
 import Landing from './pages/Landing';
@@ -25,10 +26,12 @@ function Layout({ children }) {
     return <>{children}</>;
   }
   return (
-    <CallProvider>
-      <NavBar />
-      <main className="app-main">{children}</main>
-    </CallProvider>
+    <PresenceProvider>
+      <CallProvider>
+        <NavBar />
+        <main className="app-main">{children}</main>
+      </CallProvider>
+    </PresenceProvider>
   );
 }
 

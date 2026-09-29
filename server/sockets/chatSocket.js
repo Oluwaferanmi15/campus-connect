@@ -4,10 +4,12 @@ const Conversation = require('../models/Conversation');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 
-// Tracks which pairs of users have a call in progress, so signaling can only
-// be relayed between people who actually started a call with each other.
 const activeCalls = new Set();
 const pairKey = (a, b) => [String(a), String(b)].sort().join(':');
+
+// Tracks how many live socket connections each user has open (tabs/devices).
+// A user is "online" as long as this count is above zero.
+const onlineCounts = new Map();
 
 const socketAuth = (socket, next) => {
   try {
@@ -26,6 +28,14 @@ const registerChatHandlers = (io) => {
 
   io.on('connection', (socket) => {
     socket.join(`user:${socket.userId}`);
+
+    // ---------- Presence ----------
+    const previousCount = onlineCounts.get(socket.userId) || 0;
+    onlineCounts.set(socket.userId, previousCount + 1);
+    if (previousCount === 0) {
+      io.emit('presence:online', { userId: socket.userId });
+    }
+    socket.emit('presence:init', { onlineUserIds: Array.from(onlineCounts.keys()) });
 
     socket.on('conversation:join', (conversationId) => {
       socket.join(`conversation:${conversationId}`);
@@ -147,6 +157,15 @@ const registerChatHandlers = (io) => {
     socket.on('disconnect', () => {
       if (socket.callPeerId && activeCalls.delete(pairKey(socket.userId, socket.callPeerId))) {
         io.to(`user:${socket.callPeerId}`).emit('call:ended', { fromUserId: socket.userId });
+      }
+
+      // ---------- Presence ----------
+      const remaining = (onlineCounts.get(socket.userId) || 1) - 1;
+      if (remaining <= 0) {
+        onlineCounts.delete(socket.userId);
+        io.emit('presence:offline', { userId: socket.userId });
+      } else {
+        onlineCounts.set(socket.userId, remaining);
       }
     });
   });

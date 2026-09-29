@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../hooks/useSocket';
@@ -7,10 +8,13 @@ export default function NavBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const socketRef = useSocket();
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark');
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('cc_theme', next);
+    setTheme(next);
   };
 
   return (
@@ -35,6 +39,9 @@ export default function NavBar() {
       <div className="nav-user">
         {user && (
           <>
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
             <NotificationBell socketRef={socketRef} />
             <Link to="/profile" className="nav-profile-link">
               {user.avatarUrl ? (
