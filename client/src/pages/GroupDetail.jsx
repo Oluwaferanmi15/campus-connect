@@ -20,7 +20,8 @@ export default function GroupDetail() {
     setIsMember(true);
   };
 
-  const handlePosted = (post) => setPosts((prev) => [post, ...prev]);
+    const handlePosted = (post) => setPosts((prev) => [post, ...prev]);
+  const handleDeleted = (postId) => setPosts((prev) => prev.filter((p) => p._id !== postId));
 
   if (!group) return <p>Loading group…</p>;
 
@@ -37,9 +38,9 @@ export default function GroupDetail() {
 
       <PostComposer groupId={id} onPosted={handlePosted} />
 
-      <div className="post-list">
+            <div className="post-list">
         {posts.map((post) => (
-          <PostCard key={post._id} post={post} />
+          <PostCard key={post._id} post={post} onDeleted={handleDeleted} />
         ))}
       </div>
     </div>

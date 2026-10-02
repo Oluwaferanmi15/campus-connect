@@ -89,7 +89,7 @@ export default function Landing() {
         <div className="landing-feature-row-inner">
           <div className="landing-feature-photo">
             <img
-              src="https://images.pexels.com/photos/4778634/pexels-photo-4778634.jpeg?auto=compress&cs=tinysrgb&w=900"
+              src="https://res.cloudinary.com/gjw1irbe/image/upload/v1790902683/campus-connect/n6pd3tzeaiou6phfnzmt.jpg"
               alt="Students sharing notes and studying together in a bright common room"
               loading="lazy"
             />
@@ -109,7 +109,7 @@ export default function Landing() {
         <div className="landing-feature-row-inner">
           <div className="landing-feature-photo">
             <img
-              src="https://images.pexels.com/photos/7972537/pexels-photo-7972537.jpeg?auto=compress&cs=tinysrgb&w=900"
+              src="https://res.cloudinary.com/gjw1irbe/image/upload/v1790902644/campus-connect/qwoeujueecajxrlujaoo.jpg"
               alt="A group of university students talking together outdoors on campus steps"
               loading="lazy"
             />
@@ -129,7 +129,7 @@ export default function Landing() {
         <div className="landing-feature-row-inner">
           <div className="landing-feature-photo">
             <img
-              src="https://images.pexels.com/photos/7972503/pexels-photo-7972503.jpeg?auto=compress&cs=tinysrgb&w=900"
+              src="https://res.cloudinary.com/gjw1irbe/image/upload/v1790902659/campus-connect/xkt0njhcco5wssiscshm.jpg"
               alt="Two students chatting and laughing together outdoors"
               loading="lazy"
             />

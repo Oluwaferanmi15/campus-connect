@@ -14,7 +14,8 @@ export default function Feed() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handlePosted = (post) => setPosts((prev) => [post, ...prev]);
+    const handlePosted = (post) => setPosts((prev) => [post, ...prev]);
+  const handleDeleted = (postId) => setPosts((prev) => prev.filter((p) => p._id !== postId));
 
   return (
     <div className="feed-page">
@@ -26,8 +27,8 @@ export default function Feed() {
         <p className="empty-state">No posts yet — be the first to share something.</p>
       ) : (
         <div className="post-list">
-          {posts.map((post) => (
-            <PostCard key={post._id} post={post} />
+                   {posts.map((post) => (
+            <PostCard key={post._id} post={post} onDeleted={handleDeleted} />
           ))}
         </div>
       )}
