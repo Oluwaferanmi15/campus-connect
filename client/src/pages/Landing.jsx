@@ -17,9 +17,6 @@ export default function Landing() {
     <div className="landing-page">
       <header className="landing-header">
         <div className="landing-header-inner">
-          <div className="logo">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcpj6Sw21T1tiSvU8ddt5imvOkoWMAo9aQhgoz6kxHWA&s=10" alt="" />
-          </div>
           <span className="landing-wordmark">Campus Connect</span>
           <nav className="landing-header-links">
             <Link to="/login">Log in</Link>
