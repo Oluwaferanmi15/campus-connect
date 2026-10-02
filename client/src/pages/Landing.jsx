@@ -17,6 +17,9 @@ export default function Landing() {
     <div className="landing-page">
       <header className="landing-header">
         <div className="landing-header-inner">
+          <div className="logo">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcpj6Sw21T1tiSvU8ddt5imvOkoWMAo9aQhgoz6kxHWA&s=10" alt="" />
+          </div>
           <span className="landing-wordmark">Campus Connect</span>
           <nav className="landing-header-links">
             <Link to="/login">Log in</Link>
@@ -89,7 +92,7 @@ export default function Landing() {
         <div className="landing-feature-row-inner">
           <div className="landing-feature-photo">
             <img
-              src="https://res.cloudinary.com/gjw1irbe/image/upload/v1790902683/campus-connect/n6pd3tzeaiou6phfnzmt.jpg"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1zlfw7JMHvXQB3GahRWdRZmGyFHDquceKYm_lDmC4xA&s=10"
               alt="Students sharing notes and studying together in a bright common room"
               loading="lazy"
             />

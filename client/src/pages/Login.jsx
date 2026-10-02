@@ -27,7 +27,7 @@ export default function Login() {
         className="auth-visual"
         style={{
           backgroundImage:
-            "linear-gradient(180deg, rgba(20,33,61,0.15) 0%, rgba(20,33,61,0.85) 100%), url('https://media.gettyimages.com/id/894924922/photo/torontos-six-newest-subway-stations-opened-on-the-line-1-extension-that-adds-8-6-kilometres.jpg?s=594x594&w=gi&k=20&c=SQzmv_jwIYjcYl3XsxUT_LZWCaaIi8yCDmF0wWmw5TU=')",
+            "linear-gradient(180deg, rgba(20,33,61,0.15) 0%, rgba(20,33,61,0.85) 100%), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpM6cDcFobRPPRuOgefP5ZZemjs8cDGL3UC5Y22Rj9zA&s=10')",
         }}
       >
         <div className="auth-visual-top">
