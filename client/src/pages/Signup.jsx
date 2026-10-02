@@ -43,7 +43,7 @@ export default function Signup() {
         className="auth-visual"
         style={{
           backgroundImage:
-            "linear-gradient(180deg, rgba(20,33,61,0.15) 0%, rgba(20,33,61,0.85) 100%), url('https://images.pexels.com/photos/7972501/pexels-photo-7972501.jpeg?auto=compress&cs=tinysrgb&w=1200')",
+            "linear-gradient(180deg, rgba(20,33,61,0.15) 0%, rgba(20,33,61,0.85) 100%), url('https://media.gettyimages.com/id/894924922/photo/torontos-six-newest-subway-stations-opened-on-the-line-1-extension-that-adds-8-6-kilometres.jpg?s=594x594&w=gi&k=20&c=SQzmv_jwIYjcYl3XsxUT_LZWCaaIi8yCDmF0wWmw5TU=')",
         }}
       >
         <div className="auth-visual-top">
