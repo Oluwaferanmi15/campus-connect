@@ -17,12 +17,17 @@ export default function NavBar() {
     setTheme(next);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <nav className="navbar">
       <Link to="/feed" className="brand">
         Campus Connect
       </Link>
-            <div className="nav-links">
+      <div className="nav-links">
         <NavLink to="/feed" className={({ isActive }) => (isActive ? 'active' : '')}>
           Feed
         </NavLink>
