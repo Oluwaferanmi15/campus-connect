@@ -9,6 +9,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const socketRef = useSocket();
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
@@ -18,29 +19,45 @@ export default function NavBar() {
   };
 
   const handleLogout = () => {
+    setMenuOpen(false);
     logout();
     navigate('/');
   };
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <nav className="navbar">
-      <Link to="/feed" className="brand">
-        Campus Connect
-      </Link>
+    <nav className={`navbar ${menuOpen ? 'menu-open' : ''}`}>
+      <div className="navbar-top-row">
+        <Link to="/feed" className="brand" onClick={closeMenu}>
+          Campus Connect
+        </Link>
+
+        <button
+          className="nav-hamburger"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
+      </div>
+
       <div className="nav-links">
-        <NavLink to="/feed" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <NavLink to="/feed" className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeMenu}>
           Feed
         </NavLink>
-        <NavLink to="/groups" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <NavLink to="/groups" className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeMenu}>
           Groups
         </NavLink>
-        <NavLink to="/people" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <NavLink to="/people" className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeMenu}>
           People
         </NavLink>
-        <NavLink to="/messages" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <NavLink to="/messages" className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeMenu}>
           Messages
         </NavLink>
       </div>
+
       <div className="nav-user">
         {user && (
           <>
@@ -48,7 +65,7 @@ export default function NavBar() {
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
             <NotificationBell socketRef={socketRef} />
-            <Link to="/profile" className="nav-profile-link">
+            <Link to="/profile" className="nav-profile-link" onClick={closeMenu}>
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt="" className="nav-avatar" />
               ) : (
