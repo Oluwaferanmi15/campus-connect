@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import Logo from '../components/common/Logo';
 import './Landing.css';
 
 const AVATAR_COLORS = ['#d64550', '#f5a623', '#6b9080', '#e08a3e', '#b3555f', '#4d7c6f'];
@@ -17,7 +19,7 @@ export default function Landing() {
     <div className="landing-page">
       <header className="landing-header">
         <div className="landing-header-inner">
-          <span className="landing-wordmark">Campus Connect</span>
+                    <Logo size={30} />
           <nav className="landing-header-links">
             <Link to="/login">Log in</Link>
             <Link to="/signup" className="landing-header-cta">

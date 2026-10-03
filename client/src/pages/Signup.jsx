@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/common/Logo';
 import './Auth.css';
 
 export default function Signup() {
@@ -47,7 +48,9 @@ export default function Signup() {
         }}
       >
         <div className="auth-visual-top">
-          <Link to="/">Campus Connect</Link>
+          <Link to="/">
+            <Logo size={26} />
+          </Link>
         </div>
         <div className="auth-visual-bottom">
           <h2>Join your campus.</h2>

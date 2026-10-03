@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../hooks/useSocket';
 import NotificationBell from './NotificationBell';
+import Logo from '../common/Logo';
 
 export default function NavBar() {
   const { user, logout } = useAuth();
@@ -29,8 +30,8 @@ export default function NavBar() {
   return (
     <nav className={`navbar ${menuOpen ? 'menu-open' : ''}`}>
       <div className="navbar-top-row">
-        <Link to="/feed" className="brand" onClick={closeMenu}>
-          Campus Connect
+               <Link to="/feed" className="brand" onClick={closeMenu}>
+          <Logo size={28} />
         </Link>
 
         <button
