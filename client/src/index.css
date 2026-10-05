@@ -777,6 +777,7 @@ a { color: var(--color-marigold); text-decoration: none; }
 .call-btn--end:hover { transform: rotate(135deg); }
 .call-btn--ghost { background: rgba(255, 255, 255, 0.16); }
 .call-btn--ghost.is-off { background: rgba(255, 255, 255, 0.4); }
+.call-btn--ghost.is-sharing { background: var(--color-marigold); color: #0b1220; }
 /* ===== Mobile layout (keep this at the very END of the file) ===== */
 /* ===== Mobile layout (keep this at the very END of the file) ===== */
 .navbar-top-row { display: none; }

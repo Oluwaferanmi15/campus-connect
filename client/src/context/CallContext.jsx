@@ -33,17 +33,19 @@ function CallAvatar({ peer, large }) {
 export function CallProvider({ children }) {
   const socketRef = useSocket();
 
-  const [call, setCall] = useState(null); // { status, peer, video, conversationId }
+  const [call, setCall] = useState(null);
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [muted, setMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
+  const [sharingScreen, setSharingScreen] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [notice, setNotice] = useState('');
 
   const callRef = useRef(null);
   const pcRef = useRef(null);
   const localRef = useRef(null);
+  const cameraTrackRef = useRef(null);
   const pendingIce = useRef([]);
   const remoteVideoRef = useRef(null);
   const localVideoRef = useRef(null);
@@ -69,11 +71,13 @@ export function CallProvider({ children }) {
     pcRef.current = null;
     localRef.current?.getTracks().forEach((t) => t.stop());
     localRef.current = null;
+    cameraTrackRef.current = null;
     pendingIce.current = [];
     setLocalStream(null);
     setRemoteStream(null);
     setMuted(false);
     setCameraOff(false);
+    setSharingScreen(false);
     setSeconds(0);
     callRef.current = null;
     setCall(null);
@@ -86,6 +90,7 @@ export function CallProvider({ children }) {
         video: video ? { facingMode: 'user' } : false,
       });
       localRef.current = stream;
+      cameraTrackRef.current = video ? stream.getVideoTracks()[0] : null;
       setLocalStream(stream);
       return stream;
     } catch (err) {
@@ -153,7 +158,6 @@ export function CallProvider({ children }) {
 
     const stream = await getMedia(current.video);
     if (!callRef.current) {
-      // caller hung up while we were asking for permissions
       stream?.getTracks().forEach((t) => t.stop());
       return;
     }
@@ -188,7 +192,52 @@ export function CallProvider({ children }) {
     }
   };
 
-  // Socket listeners
+  const stopScreenShare = async () => {
+    const pc = pcRef.current;
+    const cameraTrack = cameraTrackRef.current;
+    if (pc && cameraTrack) {
+      const sender = pc.getSenders().find((s) => s.track?.kind === 'video');
+      await sender?.replaceTrack(cameraTrack);
+    }
+    // Swap the local preview back to the camera stream
+    const audioTrack = localRef.current?.getAudioTracks()[0];
+    if (cameraTrack) {
+      const newLocal = new MediaStream([cameraTrack, ...(audioTrack ? [audioTrack] : [])]);
+      localRef.current = newLocal;
+      setLocalStream(newLocal);
+    }
+    setSharingScreen(false);
+  };
+
+  const toggleScreenShare = async () => {
+    if (sharingScreen) {
+      await stopScreenShare();
+      return;
+    }
+
+    const pc = pcRef.current;
+    if (!pc) return;
+
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenTrack = screenStream.getVideoTracks()[0];
+
+      const sender = pc.getSenders().find((s) => s.track?.kind === 'video');
+      await sender?.replaceTrack(screenTrack);
+
+      const audioTrack = localRef.current?.getAudioTracks()[0];
+      const newLocal = new MediaStream([screenTrack, ...(audioTrack ? [audioTrack] : [])]);
+      localRef.current = newLocal;
+      setLocalStream(newLocal);
+      setSharingScreen(true);
+
+      // Auto-revert if the user stops sharing via the browser's own UI
+      screenTrack.onended = () => stopScreenShare();
+    } catch (err) {
+      // user cancelled the screen picker — no action needed
+    }
+  };
+
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
@@ -271,14 +320,12 @@ export function CallProvider({ children }) {
     };
   }, [socketRef]);
 
-  // Call duration timer
   useEffect(() => {
     if (call?.status !== 'active') return;
     const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(timer);
   }, [call?.status]);
 
-  // Give up if nobody answers
   useEffect(() => {
     if (call?.status !== 'outgoing') return;
     const timer = setTimeout(() => {
@@ -290,7 +337,6 @@ export function CallProvider({ children }) {
     return () => clearTimeout(timer);
   }, [call?.status]);
 
-  // Attach streams to the video elements
   useEffect(() => {
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remoteStream;
   }, [remoteStream, call?.status]);
@@ -350,7 +396,7 @@ export function CallProvider({ children }) {
           {call.video && (
             <div className="call-info">
               <strong>{call.peer.name}</strong>
-              <span>{statusLabel}</span>
+              <span>{sharingScreen ? 'Presenting your screen' : statusLabel}</span>
             </div>
           )}
 
@@ -373,6 +419,15 @@ export function CallProvider({ children }) {
                 aria-label="Camera"
               >
                 {cameraOff ? '🚫' : '📷'}
+              </button>
+            )}
+            {call.video && call.status === 'active' && (
+              <button
+                className={`call-btn call-btn--ghost ${sharingScreen ? 'is-sharing' : ''}`}
+                onClick={toggleScreenShare}
+                aria-label="Share screen"
+              >
+                🖥️
               </button>
             )}
             <button className="call-btn call-btn--end" onClick={endCall} aria-label="End call">

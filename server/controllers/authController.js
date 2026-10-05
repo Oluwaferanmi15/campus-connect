@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sendWelcomeEmail } = require('../config/email');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 
-// @route POST /api/auth/signup
 const signup = async (req, res, next) => {
   try {
     const { name, email, password, university, department, graduationYear } = req.body;
@@ -29,6 +29,8 @@ const signup = async (req, res, next) => {
       graduationYear,
     });
 
+    sendWelcomeEmail({ to: user.email, name: user.name });
+
     const token = signToken(user._id);
     res.status(201).json({
       token,
@@ -45,7 +47,6 @@ const signup = async (req, res, next) => {
   }
 };
 
-// @route POST /api/auth/login
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -74,7 +75,6 @@ const login = async (req, res, next) => {
   }
 };
 
-// @route GET /api/auth/me
 const getMe = async (req, res, next) => {
   try {
     res.json({ user: req.user });
