@@ -6,6 +6,7 @@ const commentSchema = new mongoose.Schema(
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     content: { type: String, required: true, maxlength: 1000 },
     parentComment: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: null },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

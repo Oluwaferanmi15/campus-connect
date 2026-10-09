@@ -90,22 +90,32 @@ const getComments = async (req, res, next) => {
 
 const addComment = async (req, res, next) => {
   try {
-    const { content, parentComment = null } = req.body;
+    const content = (req.body.content || '').trim();
+    const parentId = req.body.parentComment || null;
     if (!content) return res.status(400).json({ message: 'Comment content is required' });
 
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
+    let parent = null;
+    if (parentId) {
+      parent = await Comment.findById(parentId);
+      if (!parent || parent.post.toString() !== post._id.toString()) {
+        return res.status(400).json({ message: 'Invalid parent comment' });
+      }
+    }
+
     const comment = await Comment.create({
       post: post._id,
       author: req.user._id,
       content,
-      parentComment,
+      parentComment: parent ? parent._id : null,
     });
 
     post.commentCount += 1;
     await post.save();
 
+    // Notify the post author, and the parent comment's author if this is a reply.
     createNotification({
       recipient: post.author,
       actor: req.user._id,
@@ -113,11 +123,81 @@ const addComment = async (req, res, next) => {
       post: post._id,
     }).catch((err) => console.error('Failed to create comment notification:', err.message));
 
+    if (parent && parent.author.toString() !== post.author.toString()) {
+      createNotification({
+        recipient: parent.author,
+        actor: req.user._id,
+        type: 'comment',
+        post: post._id,
+      }).catch((err) => console.error('Failed to create reply notification:', err.message));
+    }
+
     const populated = await comment.populate('author', 'name avatarUrl');
-    res.status(201).json({ comment: populated });
+    res.status(201).json({ comment: populated, commentCount: post.commentCount });
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { getFeed, createPost, toggleLike, deletePost, getComments, addComment };
+const toggleCommentLike = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    const userId = req.user._id.toString();
+    const alreadyLiked = comment.likes.some((id) => id.toString() === userId);
+
+    if (alreadyLiked) {
+      comment.likes = comment.likes.filter((id) => id.toString() !== userId);
+    } else {
+      comment.likes.push(req.user._id);
+    }
+    await comment.save();
+
+    res.json({ likesCount: comment.likes.length, liked: !alreadyLiked });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    const post = await Post.findById(comment.post);
+    const userId = req.user._id.toString();
+    const isCommentAuthor = comment.author.toString() === userId;
+    const isPostAuthor = post && post.author.toString() === userId;
+    if (!isCommentAuthor && !isPostAuthor) {
+      return res.status(403).json({ message: 'Not authorized to delete this comment' });
+    }
+
+    // Deleting a top-level comment also removes its replies.
+    const replies = await Comment.find({ parentComment: comment._id }).select('_id');
+    const deletedIds = [comment._id, ...replies.map((r) => r._id)];
+    await Comment.deleteMany({ _id: { $in: deletedIds } });
+
+    let commentCount = 0;
+    if (post) {
+      post.commentCount = Math.max(0, post.commentCount - deletedIds.length);
+      await post.save();
+      commentCount = post.commentCount;
+    }
+
+    res.json({ deletedIds, commentCount });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  getFeed,
+  createPost,
+  toggleLike,
+  deletePost,
+  getComments,
+  addComment,
+  toggleCommentLike,
+  deleteComment,
+};

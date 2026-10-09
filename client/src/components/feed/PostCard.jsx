@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import api from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import CommentsPanel from './CommentsPanel';
 
 const isVideoUrl = (url) =>
   /\/video\/upload\//.test(url) || /\.(mp4|mov|webm|m4v|avi)$/i.test(url);
 
 export default function PostCard({ post, onDeleted }) {
   const { user } = useAuth();
-  const [likes, setLikes] = useState(post.likes?.length || 0);
-  const [liked, setLiked] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState('');
-
   const myId = user?.id || user?._id;
   const isOwner = post.author?._id === myId;
+
+  const [likes, setLikes] = useState(post.likes?.length || 0);
+  const [liked, setLiked] = useState(post.likes?.includes(myId) || false);
+  const [commentCount, setCommentCount] = useState(post.commentCount || 0);
+  const [showComments, setShowComments] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLike = async () => {
     const res = await api.post(`/posts/${post._id}/like`);
@@ -62,10 +65,20 @@ export default function PostCard({ post, onDeleted }) {
       {error && <p className="form-error">{error}</p>}
       <footer>
         <button className={liked ? 'liked' : ''} onClick={handleLike}>
-          ♥ {likes}
+          {liked ? '♥' : '♡'} {likes}
         </button>
-        <span>{post.commentCount || 0} comments</span>
+        <button className="post-comment-btn" onClick={() => setShowComments(true)}>
+          💬 {commentCount}
+        </button>
       </footer>
+
+      {showComments && (
+        <CommentsPanel
+          post={post}
+          onClose={() => setShowComments(false)}
+          onCountChange={setCommentCount}
+        />
+      )}
     </article>
   );
 }
